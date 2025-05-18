@@ -1,15 +1,5 @@
 import { useState , useEffect } from "react"
 
-function Counter(){
-    const [count, setCount] = useState(0);
-    return(
-        <div className="w-60 p-4 shadow-md rounded-md bg-white">
-        <p>{count}</p>
-        <button onClick={() => setCount(count + 1)}>Increment</button>
-        <button onClick={() => setCount(count - 1)}>Decrement</button>
-        </div>
-    )
-}
 function Timer(){
     const [time, setTime] = useState('Timer');
     const [isActive, setIsActive] = useState(false);
@@ -52,7 +42,6 @@ export default function NoteSpace(){
         {addedNotes.map((note) => (
             <Note key={note.id} Title={note.Title} Content={note.Content} />
         ))}
-        <Counter />
         <Timer />
         </div>
     )
