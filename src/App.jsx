@@ -1,5 +1,5 @@
-import Header from '../components/header'
-import Notes from '../components/note'
+import Header from '../components/header.jsx'
+import Notes from '../components/note.jsx'
 
 
 export default function App(){
