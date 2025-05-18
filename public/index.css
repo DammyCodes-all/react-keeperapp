@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@theme {
+  --font-mclaren: "McLaren", "cursive"; 
+}
+body{
+  background-color : #f0f0f0;
+}
