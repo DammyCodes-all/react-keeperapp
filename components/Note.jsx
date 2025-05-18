@@ -22,7 +22,6 @@ function Timer(){
         }
         return () => {clearInterval(timer)}
     }, [isActive])
-
     return(
         <div className="w-60 p-4 shadow-md rounded-md bg-white">
         <p>{time}</p>
@@ -30,7 +29,7 @@ function Timer(){
             {isActive ? 'Stop Timer' : 'Start Timer'}
         </button>
         </div>
-    )
+    ) 
 }
 
 
