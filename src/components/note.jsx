@@ -44,7 +44,10 @@ function NoteAdd({ onAddNote }){
 function Note({Title , Content}){
     return(
         <div className = "w-60 p-4 shadow-md rounded-md bg-white ">
-            <p>{Title}</p>
+            <div className="flex items-center gap-2">
+                <p className="w-2 h-2 rounded-full bg-amber-500"></p>
+                <h3 className="font-bold">{Title}</h3>
+            </div>
             <p>{Content}</p>
         </div>
     )
