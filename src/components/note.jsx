@@ -1,29 +1,46 @@
 import { useState , useEffect } from "react"
 
-function Timer(){
-    const [time, setTime] = useState('Timer');
-    const [isActive, setIsActive] = useState(false);
-    useEffect(()=>{
-        let timer;
-        if(isActive){
-            timer = setInterval(() => {
-                setTime(new Date().toLocaleTimeString())
-            } , 1000)
+
+export default function NoteSpace(){
+    const [noteList, setNoteList] = useState([]);
+    useEffect(() => {
+        if (localStorage.getItem('notes')) {
+            setNoteList(JSON.parse(localStorage.getItem('notes')));
         }
-        return () => {clearInterval(timer)}
-    }, [isActive])
+    }, []);
+    function addNote(newNote){
+        setNoteList((prevNotes) => {
+            const updatedNotes = [...prevNotes, newNote];
+            localStorage.setItem('notes', JSON.stringify(updatedNotes));
+            return updatedNotes;
+        });
+    }
     return(
-        <div className="w-60 p-4 shadow-md rounded-md bg-white">
-        <p>{time}</p>
-        <button className="cursor-pointer p-1 bg-amber-300 rounded-sm" onClick={() => setIsActive(!isActive)}>
-            {isActive ? 'Stop Timer' : 'Start Timer'}
-        </button>
+        <div  className="flex flex-wrap items-center w-full gap-4 p-2 justify-center md:justify-start">
+        <NoteAdd onAddNote={addNote} />
+        {noteList.map((note , index) => (
+            <Note key={index} Title = {note.title} Content = {note.note} />
+        ))}
         </div>
-    ) 
+    )
 }
-
-
-
+function NoteAdd({ onAddNote }){
+    const [noteData, setNoteData] = useState({title : '' , note : ''});
+    function handleClick(){
+        const newNote = {
+            title: noteData.title,
+            note: noteData.note}
+        onAddNote(newNote);
+        setNoteData({title: '', note: ''});
+    }
+    return(
+        <div className = "w-60 p-4 shadow-md rounded-md bg-white flex flex-col gap-2 justify-start">
+            <input type="text" className="border-amber-500 focus:border-b focus:outline-none" name="title" placeholder= "Add title" value={noteData.title} onChange={(e) => setNoteData({...noteData, title: e.target.value})} />
+            <input type="text" className="border-amber-500 focus:border-b focus:outline-none" name="note" placeholder= "Add note" value={noteData.note} onChange={(e) => setNoteData({...noteData, note: e.target.value})} />
+            <button className="w-8 h-8 rounded-full cursor-pointer material-icons self-end transition-transform  hover:bg-neutral-200 duration-150" onClick={handleClick}>add</button>
+        </div>
+    )
+}
 function Note({Title , Content}){
     return(
         <div className = "w-60 p-4 shadow-md rounded-md bg-white ">
@@ -32,22 +49,3 @@ function Note({Title , Content}){
         </div>
     )
 }
-export default function NoteSpace(){
-    return(
-        <div className="flex flex-wrap items-center w-full gap-4 p-2 justify-center md:justify-start">
-        <Note Title = 'My own Title' Content = 'My own Content'/>
-        <Note Title = 'My own Title' Content = 'My own Content'/>
-        <Note Title = 'My own Title' Content = 'My own Content'/>
-        <Note Content = 'To write react / js code' Title = 'Tommorows task' />
-        {addedNotes.map((note) => (
-            <Note key={note.id} Title={note.Title} Content={note.Content} />
-        ))}
-        <Timer />
-        </div>
-    )
-}
-
-
-const addedNotes = [{id: 1, Title: 'My own Title', Content: 'My own Content'},
-                    {id: 2, Title: 'Tommorows task', Content: 'To write react / js code'},
-                    {id: 3, Title: 'New Note', Content: 'This is a new note'}]
