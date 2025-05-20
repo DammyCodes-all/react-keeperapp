@@ -1,65 +1,7 @@
-import { useState , useEffect } from "react"
+import { useState} from "react"
 
 
-export default function NoteSpace(){
-    const [noteList, setNoteList] = useState([]);
-    useEffect(() => {
-        if (localStorage.getItem('storedNotes')) {
-            setNoteList(JSON.parse(localStorage.getItem('storedNotes')));
-        }
-    }, []);
-    function addNote(newNote){
-        setNoteList((prevNotes) => {
-            console.log(newNote)
-            const updatedNotes = [...prevNotes, newNote];
-            localStorage.setItem('storedNotes', JSON.stringify(updatedNotes));
-            return updatedNotes;
-        });
-    }
-    function deleteNote(id){
-        setNoteList((prevNotes) => {
-            const updatedNotes = prevNotes.filter((note) => note.id !== id);
-            localStorage.setItem('storedNotes', JSON.stringify(updatedNotes));
-            return updatedNotes;
-        });
-    }
-    return(
-        <div  className="flex flex-wrap items-center w-full gap-4 p-2 justify-center md:justify-start">
-        <NoteAdd onAddNote={addNote} />
-        {noteList.map((note) => (
-            <Note key={note.id} id = {note.id} Title = {note.title} Content = {note.note} onDelete={deleteNote} />
-        ))}
-        </div>
-    )
-}
-
-
-
-function NoteAdd({ onAddNote }){
-    const [noteData, setNoteData] = useState({title : '' , note : ''});
-    function handleClick(){
-        let id = parseInt(localStorage.getItem('id') || 0) + 1
-        localStorage.setItem('id', id.toString());
-        const newNote = {
-            id : id,
-            title: noteData.title,
-            note: noteData.note}
-        onAddNote(newNote);
-        setNoteData({title: '', note: ''});
-    }
-    return(
-        <div className = "w-60 p-4 shadow-md rounded-md bg-white flex flex-col gap-2 justify-start">
-            <input type="text" className="border-amber-500 focus:border-b focus:outline-none" name="title" placeholder= "Add title" value={noteData.title} onChange={(e) => setNoteData({...noteData, title: e.target.value})} />
-            <textarea type="text" className="border-amber-500 focus:border-b focus:outline-none  min-h-[40px] max-h-[200px] overflow-y-auto resize" name="note" placeholder= "Add note" value={noteData.note} onChange={(e) => setNoteData({...noteData, note: e.target.value})}></textarea>
-            <button className="fas fa-plus w-8 h-8 rounded-full cursor-pointer  self-end transition-transform  hover:bg-neutral-200 duration-150" onClick={handleClick}></button>
-        </div>
-    )
-}
-
-
-
-
-function Note({Title , Content , id , onDelete}){
+export default function Note({Title , Content , id , onDelete}){
     const [checked , setChecked] = useState(false)
     function handleClick(){
         onDelete(id);
