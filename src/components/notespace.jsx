@@ -43,9 +43,8 @@ export default function NoteSpace(){
     function cancelEdit() {
         setEditingNoteId(null);
     }
-    
-    return(
-        <div className="flex flex-wrap items-center w-full gap-4 p-2 justify-center md:justify-start">
+      return(
+        <div className="flex flex-wrap items-start w-full gap-4 p-4 justify-center md:justify-start">
         <NoteAdd onAddNote={addNote} />
             {noteList.map((note) => (
                 editingNoteId === note.id ? (
