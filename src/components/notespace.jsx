@@ -1,6 +1,7 @@
 import { useState , useEffect } from "react"
 import Note from "./note"
 import NoteAdd from "./noteadd" 
+import NoteEdit from "./noteedit";
 
 export default function NoteSpace(){
     const [noteList, setNoteList] = useState([]);
@@ -48,12 +49,11 @@ export default function NoteSpace(){
         <NoteAdd onAddNote={addNote} />
             {noteList.map((note) => (
                 editingNoteId === note.id ? (
-                    <NoteAdd 
+                    <NoteEdit 
                         key={note.id}
                         id={note.id}
                         initialTitle={note.title}
                         initialContent={note.note}
-                        isEditing={true}
                         onSave={saveEditedNote}
                         onCancel={cancelEdit}
                     />

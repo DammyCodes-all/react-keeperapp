@@ -1,16 +1,10 @@
 import { useState} from "react"; 
+import AddIcon from '@mui/icons-material/Add';
 
-export default function NoteAdd({ onAddNote, id, initialTitle = '', initialContent = '', isEditing = false, onSave, onCancel }){
-    const [noteData, setNoteData] = useState({title: initialTitle, note: initialContent});
+export default function NoteAdd({ onAddNote}){
+    const [noteData, setNoteData] = useState({title: '', note: ''});
 
-    
-    function handleSubmit(){
-        if (isEditing) {
-            onSave(id, {
-                title: noteData.title,
-                note: noteData.note
-            });
-        } else {
+    function handleSubmit(){ 
             let id = parseInt(localStorage.getItem('id') || 0) + 1;
             localStorage.setItem('id', id.toString());
             const newNote = {
@@ -20,7 +14,6 @@ export default function NoteAdd({ onAddNote, id, initialTitle = '', initialConte
             };
             onAddNote(newNote);
             setNoteData({title: '', note: ''});
-        }
     }
     
     return(
@@ -41,19 +34,9 @@ export default function NoteAdd({ onAddNote, id, initialTitle = '', initialConte
                 value={noteData.note} 
                 onChange={(e) => setNoteData({...noteData, note: e.target.value})}
             ></textarea>
-            
-            {isEditing ? (<div className="flex justify-end gap-2">
-                    <button title="Save edit" className="fas fa-save x-2 py-1 bg-amber-500 text-white rounded-md hover:bg-amber-600 min-w-[40px]" onClick={handleSubmit}>  </button>
-                    <button title="Cancel Edit" className="fas fa-times min-w-[40px] px-2 py-1 bg-neutral-200 rounded-md hover:bg-neutral-300" onClick={onCancel}></button>
-                </div>
-            ) : (
-                <button 
-                    className="w-8 h-8 rounded-full cursor-pointer self-end flex items-center justify-center transition-transform hover:bg-neutral-200 duration-150"
-                    onClick={handleSubmit}
-                >
-                    <i className="fas fa-plus text-amber-500"></i>
+                <button className="w-8 h-8 rounded-full cursor-pointer self-end flex items-center justify-center transition-transform hover:bg-neutral-200 duration-150" onClick={handleSubmit}>
+                    <AddIcon className="text-amber-500" />
                 </button>
-            )}
         </div>
     );
 }
