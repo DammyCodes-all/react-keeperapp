@@ -3,8 +3,10 @@ import NoteSpace from './components/notespace.jsx'
 
 export default function App(){
     return(<>
-    <Header />
-    <NoteSpace />
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+        <Header />
+        <NoteSpace />
+    </div>
     </>
     )
 }
