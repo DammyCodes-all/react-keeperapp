@@ -6,7 +6,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 export default function Header(){
     return(
         <>
-        <div className="w-full bg-yellow-500 dark:bg-gray-800 h-15 shadow-lg flex items-center justify-between p-4 transition-colors duration-300">
+        <div className="w-full bg-yellow-500 dark:bg-gray-800 h-15 shadow-lg flex items-center justify-between p-1 transition-colors duration-300">
             <div className="flex items-center">
                 <EditNoteIcon className="text-white text-3xl ml-2" />
                 <h1 className="text-white text-2xl font-mclaren">Keeper</h1>
