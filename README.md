@@ -1,91 +1,68 @@
 # Keeper - Note-Taking Application
 
-A modern, responsive note-taking application built with React and Vite. This application allows users to create, edit, delete, and mark notes as completed, with a beautiful dark mode implementation.
+A modern, responsive note-taking application built with React and Vite. This application allows users to create, edit, delete, and manage notes with an intuitive interface.
 
 **Live Demo**: [https://react-keeperapp.vercel.app/](https://react-keeperapp.vercel.app/)
 
 
 ## Features
 
-- **Create Notes**: Add new notes with titles and content
-- **Edit Notes**: Update existing notes with ease
+- **Create Notes**: Add new notes with title and content
 - **Delete Notes**: Remove unwanted notes
-- **Mark as Complete**: Toggle completion status for notes
-- **Dark/Light Mode**: Seamless theme switching with smooth transitions
-- **System Theme Detection**: Automatically matches system preference for dark/light mode
-- **Persistent Storage**: Notes and theme preferences are saved to localStorage
-- **Responsive Design**: Works seamlessly on mobile, tablet, and desktop devices
-- **Expandable Textareas**: Content areas expand as you type
-- **Modern UI**: Clean, intuitive interface with Tailwind CSS
+- **Intuitive UI**: Clean and simple note-taking interface
+- **Responsive Design**: Works on mobile, tablet, and desktop devices
+- **Modern UI**: Clean interface built with Tailwind CSS
 
 ## Project Structure
 ```javascript
 src/
   ├── components/
-  │   ├── header.jsx - Application header with theme toggle functionality
-  │   ├── note.jsx - Individual note display component with dark mode styling
-  │   ├── noteadd.jsx - Form for adding notes with theme-aware design
-  │   ├── noteedit.jsx - Component for editing existing notes with theme support
-  │   └── notespace.jsx - Main component managing note state and operations
-  ├── App.jsx - Root application component with theme container
-  ├── index.css - Global styles including Tailwind dark mode configuration
+  │   ├── Header.jsx - Application header with app title
+  │   ├── Footer.jsx - Application footer with copyright information
+  │   ├── Note.jsx - Individual note display component
+  │   ├── CreateArea.jsx - Form for creating new notes
+  │   └── App.jsx - Main component managing notes state
+  ├── index.css - Global styles and Tailwind configuration
   └── main.jsx - Application entry point
 ```
 
 ## Component Workflow
 
-### NoteSpace
+### App
+- Main container component that manages the application state
+- Stores the list of notes in state
+- Passes handler functions to child components
 
-- Manages the list of notes
-- Handles operations: add, edit, delete
-- Stores notes in localStorage
-
-### NoteAdd
-
-- Creates new notes with title and content
-- Provides clean interface for note creation
-- Handles state for the new note data
-- Supports dark mode with appropriate contrast and styling
-
-### NoteEdit
-
-- Dedicated component for editing existing notes
-- Maintains separate editing state from display state
-- Provides save and cancel options
-- Preserves readability in both light and dark themes
+### CreateArea
+- Form component for creating new notes
+- Manages form inputs for title and content
+- Submits new note data to the App component
 
 ### Note
-
 - Displays individual note content
-- Provides buttons for completion, editing, and deletion
-- Shows visual indicators for completed tasks
+- Provides buttons for editing and deletion
 - Adapts appearance based on selected theme
 
 ### Header
-
 - Houses the application title and branding
-- Contains theme toggle component
-- Adapts colors and styling based on current theme
-- Preserves accessibility in both modes
 
-### ThemeToggle
-
-- Handles theme switching between light and dark modes
-- Persists user preference in localStorage
-- Syncs with system preference by default
-- Provides smooth transition animations between themes
+### Footer
+- Displays copyright and additional information
 
 ## Implementation Details
 
 1. **State Management**: Uses React's useState and useEffect hooks for local state management
-2. **Local Storage**: Persists notes and theme preferences using browser localStorage API
-3. **Conditional Rendering**: Dynamically changes UI based on application state and theme
+2. **Local Storage**: Persists notes using browser localStorage API
+3. **Conditional Rendering**: Dynamically changes UI based on application state
 4. **Responsive Design**: Uses Tailwind CSS for responsive styling across all device sizes
 5. **Dark Mode Implementation**: Leverages Tailwind CSS dark mode with custom theme toggle
 6. **CSS Transitions**: Smooth transitions between themes using CSS transition properties
 7. **Material UI Icons**: Leverages Material UI for consistent, clean iconography
 8. **Component Architecture**: Modular components with clear separation of concerns
 9. **System Theme Detection**: Uses matchMedia API to detect system dark mode preference
+10. **Accessibility**: Implements ARIA attributes, keyboard navigation, and proper focus management
+
+
 
 ## Getting Started
 
@@ -113,7 +90,7 @@ src/
 - **Vite 6** - Fast build tool and development server
 - **Tailwind CSS 4** - Utility-first CSS framework with dark mode support
 - **Material UI 7** - Component library with pre-built icons
-- **LocalStorage API** - Browser-based persistence for notes and theme
+- **LocalStorage API** - Browser-based persistence for notes
 - **Vercel** - Hosting and deployment platform
 
 ## Dark Mode Implementation
@@ -149,6 +126,10 @@ const toggleTheme = () => {
 - **Focus Indicators**: Visible focus states for keyboard navigation
 - **Descriptive Button Labels**: All interactive elements have descriptive text or aria-labels
 - **Responsive Text Sizing**: Text scales appropriately across device sizes
+- **ARIA Attributes**: Proper use of aria-label, aria-describedby, and role attributes
+- **Keyboard Navigation**: All features accessible without a mouse
+- **Undo Functionality**: Provides sufficient time to react to actions like deletion
+- **Error Prevention**: Confirmation for destructive actions with clear undo options
 
 ## Future Enhancements
 
@@ -171,9 +152,6 @@ const toggleTheme = () => {
 
 Visit the live application at [https://react-keeperapp.vercel.app/](https://react-keeperapp.vercel.app/)
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 

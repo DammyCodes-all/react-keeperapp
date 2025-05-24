@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import SaveIcon from '@mui/icons-material/Save';
+import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 
 const NoteEdit = ({id, initialTitle, initialContent, onSave, onCancel }) => {
@@ -27,7 +27,7 @@ const NoteEdit = ({id, initialTitle, initialContent, onSave, onCancel }) => {
             ></textarea>
             <div className="flex justify-end gap-2">
                 <button title="Save edit" className="px-2 py-1 bg-amber-500 text-white rounded-md hover:bg-amber-600 min-w-[40px] flex items-center justify-center" onClick={handleSubmit}>
-                    <SaveIcon fontSize="small" />
+                    <CheckIcon fontSize="small" />
                 </button>
                 <button title="Cancel Edit" className="px-2 py-1 bg-neutral-200 dark:bg-gray-700 dark:text-white rounded-md hover:bg-neutral-300 dark:hover:bg-gray-600 min-w-[40px] flex items-center justify-center transition-colors duration-300" onClick={onCancel}>
                     <CloseIcon fontSize="small" />
