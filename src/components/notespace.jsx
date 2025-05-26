@@ -1,46 +1,38 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect , useReducer} from "react"
 import Note from "./note"
 import NoteAdd from "./noteadd" 
 import NoteEdit from "./noteedit";
 import LinearProgress from "@mui/material/LinearProgress";
 
 const UNDO_DURATION = 5000;
+const notes = JSON.parse(localStorage.getItem('storedNotes')) || []
 
 export default function NoteSpace(){
-    const [noteList, setNoteList] = useState([]);
+    const [noteList , dispatch] = useReducer(noteReducer , notes)
     const [editingNoteId, setEditingNoteId] = useState(null);
     const [isUndoVisible, setIsUndoVisible] = useState(false);
     const [notesBeforeDelete, setNotesBeforeDelete] = useState(null);
 
-    // Load notes from localStorage on component mount
     useEffect(() => {
-        if (localStorage.getItem('storedNotes')) {
-            setNoteList(JSON.parse(localStorage.getItem('storedNotes')));
-        }
-    }, []);
-    
-    
+        localStorage.setItem('storedNotes', JSON.stringify(noteList));
+    }, [noteList]);
+
     function addNote(newNote){
-        setNoteList((prevNotes) => {
-            const updatedNotes = [...prevNotes, newNote];
-            localStorage.setItem('storedNotes', JSON.stringify(updatedNotes));
-            return updatedNotes;
-        });
+        dispatch({
+            type : 'addNote', 
+            note : newNote
+        })
     }
     
     function deleteNote(id){
         setNotesBeforeDelete(noteList)
-        setNoteList((prevNotes) => {
-            const updatedNotes = prevNotes.filter((note) => note.id !== id);
-            localStorage.setItem('storedNotes', JSON.stringify(updatedNotes));
-            return updatedNotes;
-        });
+        dispatch({ type: 'deleteNote', id });
         setIsUndoVisible(true);
     }
     
     function onUndo(){
         if (notesBeforeDelete) {
-            setNoteList(notesBeforeDelete);
+            dispatch({type : 'undo' , notes : notesBeforeDelete})
             localStorage.setItem('storedNotes', JSON.stringify(notesBeforeDelete));
             setNotesBeforeDelete(null);
             setIsUndoVisible(false);
@@ -57,13 +49,7 @@ export default function NoteSpace(){
     }
     
     function saveEditedNote(id, updatedNote) {
-        setNoteList((prevNotes) => {
-            const updatedNotes = prevNotes.map(note => 
-                note.id === id ? {...note, title: updatedNote.title, note: updatedNote.note} : note
-            );
-            localStorage.setItem('storedNotes', JSON.stringify(updatedNotes));
-            return updatedNotes;
-        });
+        dispatch({type : 'saveEditedNote' , id : id , updatedNote : updatedNote});
         setEditingNoteId(null);
     }
     
@@ -77,7 +63,7 @@ export default function NoteSpace(){
             {noteList.map((note) => (
                 editingNoteId === note.id ? (
                     <NoteEdit 
-                        key={note.id}
+                        key={`edit-${note.id}`}
                         id={note.id}
                         initialTitle={note.title}
                         initialContent={note.note}
@@ -86,7 +72,7 @@ export default function NoteSpace(){
                     />
                 ) : (
                     <Note 
-                        key={note.id} 
+                        key={`view-${note.id}`}  
                         id={note.id} 
                         Title={note.title} 
                         Content={note.note} 
@@ -136,7 +122,7 @@ function UndoDelete({ onUndo, duration, onTimerComplete }) {
                 </div>
                 <button 
                     aria-label="Undo note deletion"
-                    className="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-0.5 rounded text-xs uppercase transition-colors duration-200"
+                    className="bg-amber-500 cursor-pointer hover:bg-amber-600 text-white px-2.5 py-0.5 rounded text-xs uppercase transition-colors duration-200"
                     onClick={onUndo}>
                     Undo
                 </button>
@@ -162,4 +148,30 @@ function UndoDelete({ onUndo, duration, onTimerComplete }) {
             </div>
         </div>
     );
+}
+
+
+
+function noteReducer(noteList , action){
+    switch (action.type){
+        case 'addNote':{
+            const updatedNotes = [...noteList, action.note]
+            return updatedNotes;
+        }
+        case 'deleteNote':{
+            const filteredNotes = noteList.filter(note => note.id !== action.id);
+            return filteredNotes;
+        }
+        case 'undo' : {
+            return action.notes;
+        }
+        case 'saveEditedNote' : {
+            const updatedNotes = noteList.map(note =>
+                note.id === action.id ? {...note, title: action.updatedNote.title, note: action.updatedNote.note} : note
+        );
+            return updatedNotes;
+        }
+        default:
+            return noteList;
+    }
 }

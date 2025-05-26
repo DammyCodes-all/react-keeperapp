@@ -15,7 +15,8 @@ export default function NoteAdd({ onAddNote }){
             };
             onAddNote(newNote);
             setNoteData({title: '', note: ''});
-            setIsInputFocused(false);    }    return(
+            setIsInputFocused(false);    }    
+    return(
         <div className="w-full flex justify-center items-center">
             <div className="w-4/5 md:w-80 p-4 shadow-lg rounded-md bg-white dark:bg-gray-800 flex flex-col gap-2 justify-start transition-colors duration-300">
             {isInputFocused ?

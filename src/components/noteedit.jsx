@@ -9,7 +9,8 @@ const NoteEdit = ({id, initialTitle, initialContent, onSave, onCancel }) => {
         onSave(id, {
             title: editNote.title,
             note: editNote.note
-        })    }    return(
+        })    }    
+    return(
         <div className="w-4/5 md:w-80 p-4 shadow-md rounded-md bg-white dark:bg-gray-800 flex flex-col gap-2 justify-start min-h-[100px] transition-colors duration-300">              
             <input 
                 type="text"  
