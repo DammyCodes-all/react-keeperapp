@@ -150,7 +150,7 @@ function UndoDelete({ onUndo, duration, onTimerComplete }) {
 
 function noteReducer(state , action){
     switch (action.type){
-        case 'addNote':{
+        case 'addNote': {
             const updatedNotes = {...state , noteList : [...state.noteList , action.note ]}
             return updatedNotes;
         }
