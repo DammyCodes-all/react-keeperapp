@@ -10,14 +10,20 @@ const initialState = {
     noteList : JSON.parse(localStorage.getItem('storedNotes')) || [],
     editingNoteId : null,
     isUndoVisible : false,
-    notesBeforeDelete : []
+    notesBeforeDelete : [],
+    searchedNotes : []
 }
 
-export default function NoteSpace(){
+export default function NoteSpace({query}){
     const [state , dispatch] = useReducer(noteReducer , initialState)
+    
     useEffect(() => {
         localStorage.setItem('storedNotes', JSON.stringify(state.noteList));
     }, [state.noteList]);
+    
+    useEffect(()=>{
+        dispatch({type : 'search' , query : query.trim()})
+    }, [query])
 
     function addNote(newNote){
         dispatch({ type : 'addNote', note : newNote})
@@ -45,10 +51,12 @@ export default function NoteSpace(){
         dispatch({type : 'undoEdit'})
     }
     
+    const notesToDisplay = query.trim() ? state.searchedNotes : state.noteList;
+    
     return(
         <div className="flex flex-wrap items-start w-full gap-4 p-4 justify-center md:justify-start">
             <NoteAdd onAddNote={addNote} />
-            {state.noteList.map((note) => (
+            {notesToDisplay.map((note) => (
                 state.editingNoteId === note.id ? (
                     <NoteEdit 
                         key={`edit-${note.id}`}
@@ -167,6 +175,16 @@ function noteReducer(state , action){
         }
         case 'undoTimercomplete':{
             return {...state , isUndoVisible : false , notesBeforeDelete : []}
+        }
+        case 'search' :{
+            if(action.query === '') {
+                return {...state, searchedNotes: []} // Reset when empty
+            }
+            const searchResult = state.noteList.filter((note) => 
+                note.title.toLowerCase().includes(action.query.toLowerCase()) ||
+                note.note.toLowerCase().includes(action.query.toLowerCase())
+)
+            return {...state , searchedNotes : searchResult}
         }
         default:
             return state;

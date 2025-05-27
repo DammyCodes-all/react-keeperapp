@@ -1,6 +1,6 @@
 # Keeper - Note-Taking Application
 
-A modern, responsive note-taking application built with React and Vite. This application allows users to create, edit, delete, and manage notes with an intuitive interface and advanced state management.
+A modern, responsive note-taking application built with React and Vite. This application allows users to create, edit, delete, and search through notes with an intuitive interface and advanced state management.
 
 **Live Demo**: [https://react-keeperapp.vercel.app/](https://react-keeperapp.vercel.app/)
 
@@ -10,6 +10,7 @@ A modern, responsive note-taking application built with React and Vite. This app
 - **Create Notes**: Add new notes with title and content
 - **Edit Notes**: In-place editing with save/cancel functionality
 - **Delete Notes**: Remove unwanted notes with undo capability
+- **Search Notes**: Real-time search functionality across note titles and content
 - **Undo System**: 5-second undo window for deleted notes with progress indicator
 - **Dark Mode**: Toggle between light and dark themes with system preference detection
 - **Responsive Design**: Works seamlessly on mobile, tablet, and desktop devices
@@ -20,7 +21,7 @@ A modern, responsive note-taking application built with React and Vite. This app
 ```javascript
 src/
   ├── components/
-  │   ├── header.jsx - Application header with theme toggle
+  │   ├── header.jsx - Application header with search bar and theme toggle
   │   ├── note.jsx - Individual note display component with actions
   │   ├── noteadd.jsx - Form for creating new notes
   │   ├── noteedit.jsx - In-place note editing component
@@ -32,11 +33,22 @@ src/
 
 ## Component Workflow
 
+### Header (Application Header)
+- **SearchBar**: Real-time search functionality with responsive design
+  - Expandable search input with smooth animations
+  - Clear button for easy query reset
+  - Responsive width scaling from mobile to desktop
+  - Theme-aware styling with amber accent colors
+- **ThemeToggle**: Dark/light mode switching with persistence
+- Responsive layout with proper spacing and alignment
+
 ### NoteSpace (Main Container)
 - Manages application state using React's useReducer hook
 - Handles all note operations through a centralized reducer
+- **Search Implementation**: Real-time filtering of notes based on query
 - Implements undo functionality with automatic timer
 - Persists data to localStorage automatically
+- Conditional rendering between full notes and filtered search results
 
 ### NoteAdd
 - Form component for creating new notes
@@ -56,33 +68,56 @@ src/
 - Preserves original data until save is confirmed
 - Seamless transition back to display mode
 
-### Header
-- Houses the application title and theme toggle
-- Implements dark/light mode switching with persistence
-- Responsive design with Material-UI icons
-
 ### UndoDelete
 - Toast-style notification for deleted notes
 - 5-second countdown with visual progress indicator
 - One-click undo functionality
 - Auto-dismisses when timer expires
 
+## Search Functionality
+
+The application includes a comprehensive search system:
+
+```jsx
+// Search implementation in reducer
+case 'search': {
+  if(action.query === '') {
+    return {...state, searchedNotes: []} // Reset when empty
+  }
+  const searchResult = state.noteList.filter((note) => 
+    note.title.toLowerCase().includes(action.query.toLowerCase()) ||
+    note.note.toLowerCase().includes(action.query.toLowerCase())
+  )
+  return {...state, searchedNotes: searchResult}
+}
+
+// Conditional rendering based on search state
+const notesToDisplay = query.trim() ? state.searchedNotes : state.noteList;
+```
+
+**Search Features**:
+- **Real-time filtering**: Results update as you type
+- **Case-insensitive**: Matches regardless of capitalization
+- **Multi-field search**: Searches both note titles and content
+- **Responsive UI**: Search bar adapts to different screen sizes
+- **Clear functionality**: Easy to reset search with X button
+- **Visual feedback**: Animated underline indicates active search
+
 ## Implementation Details
 
 1. **Advanced State Management**: Uses React's useReducer hook for predictable state updates
-2. **Reducer Pattern**: Centralized state logic with action-based updates (addNote, deleteNote, editNote, etc.)
+2. **Reducer Pattern**: Centralized state logic with action-based updates (addNote, deleteNote, editNote, search, etc.)
 3. **Local Storage Integration**: Automatic persistence using useEffect hooks
-4. **Undo System**: Sophisticated undo functionality with timer-based auto-cleanup
-5. **Conditional Rendering**: Dynamic component switching between view and edit modes
-6. **Responsive Design**: Mobile-first approach using Tailwind CSS utilities
-7. **Dark Mode Implementation**: System preference detection with manual override capability
-8. **CSS Transitions**: Smooth animations and state transitions throughout the UI
-9. **Material UI Integration**: Professional icons and progress indicators
-10. **Component Architecture**: Modular design with clear separation of concerns
-11. **Error Handling**: Defensive programming with optional chaining and fallbacks
-12. **Performance Optimization**: Efficient re-renders through proper state management
-
-
+4. **Search System**: Sophisticated real-time search with filter-based implementation
+5. **Undo System**: Sophisticated undo functionality with timer-based auto-cleanup
+6. **Conditional Rendering**: Dynamic component switching between view and edit modes
+7. **Responsive Design**: Mobile-first approach using Tailwind CSS utilities
+8. **Dark Mode Implementation**: System preference detection with manual override capability
+9. **CSS Transitions**: Smooth animations and state transitions throughout the UI
+10. **Material UI Integration**: Professional icons and progress indicators
+11. **Component Architecture**: Modular design with clear separation of concerns
+12. **Error Handling**: Defensive programming with optional chaining and fallbacks
+13. **Performance Optimization**: Efficient re-renders through proper state management
 
 ## Getting Started
 
@@ -110,6 +145,7 @@ src/
 - **Vite 6** - Fast build tool and development server with HMR
 - **Tailwind CSS 4** - Utility-first CSS framework with dark mode support
 - **Material UI 7** - Component library with pre-built icons and components
+- **Lucide React** - Modern icon library for search and UI elements
 - **useReducer Hook** - Advanced state management for complex state logic
 - **LocalStorage API** - Browser-based persistence for notes
 - **Optional Chaining** - Modern JavaScript for safe property access
@@ -125,80 +161,18 @@ The application features a comprehensive dark mode implementation:
 4. **System Preference Detection**: Defaults to system preference on first visit
 5. **Consistent Experience**: All components maintain readability and aesthetics in both modes
 6. **Tailwind Integration**: Uses Tailwind's dark mode class strategy for consistent styling
+7. **Search Bar Theming**: Search component adapts colors and contrast for both themes
 
 ```jsx
-// Example of useReducer state management
-function noteReducer(state, action) {
-  switch (action.type) {
-    case 'addNote':
-      return {...state, noteList: [...state.noteList, action.note]};
-    case 'deleteNote':
-      return {
-        ...state, 
-        noteList: state.noteList.filter(note => note.id !== action.id),
-        isUndoVisible: true,
-        notesBeforeDelete: state.noteList
-      };
-    case 'undoDelete':
-      return {
-        ...state,
-        noteList: state.notesBeforeDelete,
-        isUndoVisible: false,
-        notesBeforeDelete: []
-      };
-    case 'editNote':
-      return {...state, editingNoteId: action.id};
-    default:
-      return state;
-  }
-}
-
-// Usage in component
-const [state, dispatch] = useReducer(noteReducer, initialState);
-dispatch({ type: 'addNote', note: newNote });
+// Example of theme-aware search component
+<form className="bg-white dark:bg-gray-700 focus-within:rounded-[1px] shadow-sm hover:shadow-md">
+  <div className="bg-amber-500 dark:bg-amber-400 origin-center scale-x-0 transition-transform"></div>
+  <button className="text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300">
+    <Search className="w-3 h-3 md:w-4 md:h-4" />
+  </button>
+  <input className="text-gray-800 dark:text-gray-200 placeholder:text-[#8b8ba7] dark:placeholder:text-gray-400" />
+</form>
 ```
-
-## Accessibility Features
-
-- **Color Contrast**: Maintains WCAG AA standard contrast ratios in both themes
-- **Semantic HTML**: Uses appropriate HTML elements for better screen reader support
-- **Focus Indicators**: Visible focus states for keyboard navigation
-- **Descriptive Button Labels**: All interactive elements have descriptive text or aria-labels
-- **Responsive Text Sizing**: Text scales appropriately across device sizes
-- **ARIA Attributes**: Proper use of aria-label, aria-describedby, and role attributes
-- **Keyboard Navigation**: All features accessible without a mouse
-- **Undo Functionality**: Provides sufficient time to react to actions like deletion
-- **Error Prevention**: Confirmation for destructive actions with clear undo options
-
-## Future Enhancements
-
-- **Note Categories**: Organize notes with tags and categories
-- **Search Functionality**: Find notes quickly with text search
-- **Rich Text Editing**: Add formatting options like bold, italic, lists
-- **Note Sharing**: Share notes via URL or export to different formats
-- **Cloud Sync**: User authentication with cloud-based storage
-- **Collaborative Editing**: Real-time collaborative note editing
-- **Note Templates**: Pre-defined templates for different note types
-- **Advanced Filtering**: Filter by date, category, completion status
-- **Keyboard Shortcuts**: Power-user features with hotkeys
-- **Note Archiving**: Archive old notes without deleting them
-- **Backup/Export**: Export notes to PDF, Markdown, or JSON
-- **Drag and Drop**: Reorder notes with drag-and-drop functionality
-
-## Performance Optimization
-
-- **useReducer Pattern**: Efficient state updates with predictable state transitions
-- **Minimal Re-renders**: Optimized component structure to prevent unnecessary updates
-- **Local Storage Efficiency**: Batched localStorage operations with useEffect
-- **Component Memoization**: Strategic use of React patterns for performance
-- **Tailwind CSS Optimization**: Purged unused styles in production builds
-- **Lazy Loading**: Efficient component loading and bundle splitting
-- **Memory Management**: Proper cleanup of timers and event listeners
-
-## Live Demo
-
-Visit the live application at [https://react-keeperapp.vercel.app/](https://react-keeperapp.vercel.app/)
-
 
 ## State Management Architecture
 
@@ -209,13 +183,15 @@ const initialState = {
   noteList: JSON.parse(localStorage.getItem('storedNotes')) || [],
   editingNoteId: null,
   isUndoVisible: false,
-  notesBeforeDelete: []
+  notesBeforeDelete: [],
+  searchedNotes: []
 };
 
 // Centralized state updates through actions
 dispatch({ type: 'addNote', note: newNote });
 dispatch({ type: 'deleteNote', id: noteId });
 dispatch({ type: 'editNote', id: noteId });
+dispatch({ type: 'search', query: searchQuery });
 dispatch({ type: 'undoDelete' });
 ```
 
@@ -223,11 +199,65 @@ This pattern provides:
 - **Predictable State Updates**: All state changes go through the reducer
 - **Time Travel Debugging**: Easy to track state changes and debug issues
 - **Undo/Redo Capability**: Built-in support for complex state rollbacks
+- **Search State Management**: Dedicated search state with filtering logic
 - **Scalability**: Easy to add new actions and state properties
+
+## Accessibility Features
+
+- **Color Contrast**: Maintains WCAG AA standard contrast ratios in both themes
+- **Semantic HTML**: Uses appropriate HTML elements for better screen reader support
+- **Focus Indicators**: Visible focus states for keyboard navigation
+- **Descriptive Button Labels**: All interactive elements have descriptive text or aria-labels
+- **Search Accessibility**: Search form with proper labels and keyboard navigation
+- **Responsive Text Sizing**: Text scales appropriately across device sizes
+- **ARIA Attributes**: Proper use of aria-label, aria-describedby, and role attributes
+- **Keyboard Navigation**: All features accessible without a mouse
+- **Undo Functionality**: Provides sufficient time to react to actions like deletion
+- **Error Prevention**: Confirmation for destructive actions with clear undo options
+
+## Performance Optimization
+
+- **useReducer Pattern**: Efficient state updates with predictable state transitions
+- **Minimal Re-renders**: Optimized component structure to prevent unnecessary updates
+- **Search Optimization**: Efficient filtering with proper array methods
+- **Local Storage Efficiency**: Batched localStorage operations with useEffect
+- **Component Memoization**: Strategic use of React patterns for performance
+- **Tailwind CSS Optimization**: Purged unused styles in production builds
+- **Lazy Loading**: Efficient component loading and bundle splitting
+- **Memory Management**: Proper cleanup of timers and event listeners
+
+## Future Enhancements
+
+- **Advanced Search**: 
+  - Search result highlighting
+  - Fuzzy search implementation
+  - Search suggestions and autocomplete
+  - Search history
+- **Note Categories**: Organize notes with tags and categories
+- **Rich Text Editing**: Add formatting options like bold, italic, lists
+- **Note Sharing**: Share notes via URL or export to different formats
+- **Cloud Sync**: User authentication with cloud-based storage
+- **Collaborative Editing**: Real-time collaborative note editing
+- **Note Templates**: Pre-defined templates for different note types
+- **Advanced Filtering**: Filter by date, category, completion status
+- **Keyboard Shortcuts**: Power-user features with hotkeys including search shortcuts
+- **Note Archiving**: Archive old notes without deleting them
+- **Backup/Export**: Export notes to PDF, Markdown, or JSON
+- **Drag and Drop**: Reorder notes with drag-and-drop functionality
+
+## Live Demo
+
+Visit the live application at [https://react-keeperapp.vercel.app/](https://react-keeperapp.vercel.app/)
+
+Try the search functionality by:
+1. Creating several notes with different titles and content
+2. Using the search bar in the header to filter notes in real-time
+3. Clearing the search to return to all notes
+4. Testing the responsive search bar on different device sizes
 
 ## Acknowledgments
 
 - Inspired by Google Keep
-- Icons from Material UI
+- Icons from Material UI and Lucide React
 - Tailwind CSS for styling
 - React community for best practices and patterns
