@@ -3,65 +3,53 @@ import Note from "./note"
 import NoteAdd from "./noteadd" 
 import NoteEdit from "./noteedit";
 import LinearProgress from "@mui/material/LinearProgress";
+// import { UpdateRounded } from "@mui/icons-material";
 
 const UNDO_DURATION = 5000;
-const notes = JSON.parse(localStorage.getItem('storedNotes')) || []
+const initialState = {
+    noteList : JSON.parse(localStorage.getItem('storedNotes')) || [],
+    editingNoteId : null,
+    isUndoVisible : false,
+    notesBeforeDelete : []
+}
 
 export default function NoteSpace(){
-    const [noteList , dispatch] = useReducer(noteReducer , notes)
-    const [editingNoteId, setEditingNoteId] = useState(null);
-    const [isUndoVisible, setIsUndoVisible] = useState(false);
-    const [notesBeforeDelete, setNotesBeforeDelete] = useState(null);
-
+    const [state , dispatch] = useReducer(noteReducer , initialState)
     useEffect(() => {
-        localStorage.setItem('storedNotes', JSON.stringify(noteList));
-    }, [noteList]);
+        localStorage.setItem('storedNotes', JSON.stringify(state.noteList));
+    }, [state.noteList]);
 
     function addNote(newNote){
-        dispatch({
-            type : 'addNote', 
-            note : newNote
-        })
+        dispatch({ type : 'addNote', note : newNote})
     }
     
     function deleteNote(id){
-        setNotesBeforeDelete(noteList)
-        dispatch({ type: 'deleteNote', id });
-        setIsUndoVisible(true);
+        dispatch({ type: 'deleteNote', id })
     }
-    
     function onUndo(){
-        if (notesBeforeDelete) {
-            dispatch({type : 'undo' , notes : notesBeforeDelete})
-            localStorage.setItem('storedNotes', JSON.stringify(notesBeforeDelete));
-            setNotesBeforeDelete(null);
-            setIsUndoVisible(false);
+        if (state.notesBeforeDelete) {
+            dispatch({type : 'undoDelete' })
         }
     }
-    
     function handleTimerComplete() {
-        setIsUndoVisible(false);
-        setNotesBeforeDelete(null);
+        dispatch({type : 'undoTimercomplete'})
     }
-
     function editNote(id){
-        setEditingNoteId(id);
+        dispatch({type : 'editNote' , id : id})
     }
     
     function saveEditedNote(id, updatedNote) {
         dispatch({type : 'saveEditedNote' , id : id , updatedNote : updatedNote});
-        setEditingNoteId(null);
     }
-    
     function cancelEdit() {
-        setEditingNoteId(null);
+        dispatch({type : 'undoEdit'})
     }
     
     return(
         <div className="flex flex-wrap items-start w-full gap-4 p-4 justify-center md:justify-start">
             <NoteAdd onAddNote={addNote} />
-            {noteList.map((note) => (
-                editingNoteId === note.id ? (
+            {state.noteList.map((note) => (
+                state.editingNoteId === note.id ? (
                     <NoteEdit 
                         key={`edit-${note.id}`}
                         id={note.id}
@@ -82,7 +70,7 @@ export default function NoteSpace(){
                 )
             ))}
             
-            {isUndoVisible && 
+            {state.isUndoVisible && 
                 <UndoDelete 
                     onUndo={onUndo} 
                     duration={UNDO_DURATION}
@@ -152,26 +140,35 @@ function UndoDelete({ onUndo, duration, onTimerComplete }) {
 
 
 
-function noteReducer(noteList , action){
+function noteReducer(state , action){
     switch (action.type){
         case 'addNote':{
-            const updatedNotes = [...noteList, action.note]
+            const updatedNotes = {...state , noteList : [...state.noteList , action.note ]}
             return updatedNotes;
         }
         case 'deleteNote':{
-            const filteredNotes = noteList.filter(note => note.id !== action.id);
-            return filteredNotes;
+            const filteredNotes = state.noteList.filter(note => note.id !== action.id)
+            return {...state , noteList : filteredNotes , isUndoVisible : true , notesBeforeDelete : state.noteList}
         }
-        case 'undo' : {
-            return action.notes;
+        case 'undoDelete' : {
+            return {...state , noteList : state.notesBeforeDelete ,  isUndoVisible : false , notesBeforeDelete : []}
         }
         case 'saveEditedNote' : {
-            const updatedNotes = noteList.map(note =>
+            const updatedNotes = state.noteList.map(note =>
                 note.id === action.id ? {...note, title: action.updatedNote.title, note: action.updatedNote.note} : note
         );
-            return updatedNotes;
+            return {...state , editingNoteId : null , noteList : updatedNotes}
+        }
+        case 'editNote' : {
+            return {...state , editingNoteId : action.id}
+        }
+        case 'undoEdit' : {
+            return {...state , editingNoteId : null}
+        }
+        case 'undoTimercomplete':{
+            return {...state , isUndoVisible : false , notesBeforeDelete : []}
         }
         default:
-            return noteList;
+            return state;
     }
 }
