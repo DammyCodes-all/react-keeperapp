@@ -23,7 +23,7 @@ export default function NoteSpace({query}){
     
     useEffect(()=>{
         dispatch({type : 'search' , query : query.trim()})
-    }, [query])
+    }, [query , state.noteList])
 
     function addNote(newNote){
         dispatch({ type : 'addNote', note : newNote})
@@ -176,9 +176,9 @@ function noteReducer(state , action){
         case 'undoTimercomplete':{
             return {...state , isUndoVisible : false , notesBeforeDelete : []}
         }
-        case 'search' :{
+        case 'search' : {
             if(action.query === '') {
-                return {...state, searchedNotes: []} // Reset when empty
+                return {...state, searchedNotes: []} 
             }
             const searchResult = state.noteList.filter((note) => 
                 note.title.toLowerCase().includes(action.query.toLowerCase()) ||
